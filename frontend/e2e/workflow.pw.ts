@@ -1,0 +1,24 @@
+import {test,expect} from '@playwright/test';
+import path from 'node:path';
+test('upload, analyze, inspect, review and export',async({page})=>{
+ test.skip(!process.env.FCBC_USERNAME||!process.env.FCBC_PASSWORD,'Supply credentials for an isolated local test account');
+ await page.goto('/');
+ await page.getByLabel('Username').fill(process.env.FCBC_USERNAME!);
+ await page.getByLabel('Password').fill(process.env.FCBC_PASSWORD!);
+ await page.getByRole('button',{name:'Sign in securely'}).click();
+ await expect(page.getByRole('heading',{name:'Security overview'})).toBeVisible();
+ await page.getByRole('button',{name:'Upload Telemetry',exact:true}).click();
+ await page.getByLabel('Telemetry file').setInputFiles(path.resolve('../sample_data/ransomware-like-disruption.json'));
+ await page.getByRole('button',{name:'Validate & preview'}).click();
+ await expect(page.getByRole('heading',{name:'Review before analysis'})).toBeVisible();
+ await page.getByRole('button',{name:'Confirm analysis'}).click();
+ await expect(page.getByRole('heading',{name:'Analysis replay'})).toBeVisible();
+ await page.getByRole('button',{name:'Alert Investigation',exact:true}).click();
+ await page.getByRole('button',{name:'Update review'}).first().click();
+ await page.getByLabel('Analyst notes').fill('Browser E2E evidence inspected');
+ await page.getByRole('button',{name:'Save review'}).click();
+ await page.getByRole('button',{name:'Reports',exact:true}).click();
+ const download=page.waitForEvent('download');
+ await page.locator('a[href*="format=json"]').click();
+ expect((await download).suggestedFilename()).toMatch(/\.json$/);
+});

@@ -1,0 +1,15 @@
+services:
+  sentinel:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env (12+ characters)}
+      DATABASE_URL: sqlite:////data/sentinel.db
+      COOKIE_SECURE: "false"
+    volumes:
+      - sentinel-data:/data
+    restart: unless-stopped
+volumes:
+  sentinel-data:
