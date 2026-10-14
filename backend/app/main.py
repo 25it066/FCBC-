@@ -1,6 +1,7 @@
 import os,time,secrets,json,threading,logging
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
+from app.main import app
 from contextlib import asynccontextmanager
 from typing import Literal
 from fastapi import FastAPI,Depends,HTTPException,UploadFile,File,Form,Request,Response,WebSocket,WebSocketDisconnect,Query
